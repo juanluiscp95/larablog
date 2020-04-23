@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name("home");
+
 
 /*Route::get('/test', function () {
     return "hola mundo";
@@ -51,7 +49,7 @@ Route::resource('dashboard/category', 'dashboard\CategoryController');
 Route::resource('dashboard/user', 'dashboard\UserController');
 
 
-
+Route::get('/', 'web\WebController@index')->name("index");
 
 
 Auth::routes();

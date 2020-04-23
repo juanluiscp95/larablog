@@ -10,11 +10,7 @@
 </head>
 <body>
 
-    @include('dashboard.partials.nav-header-main')
-
-    <div class="container">
-
-        @include('dashboard.partials.session-flash-status')
+    <div class="container" id="app">
 
         @yield('content')
     </div>
