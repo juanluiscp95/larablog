@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use App\Tag;
 use App\User;
+use App\Events\UserCreated;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserPost;
 use App\Http\Requests\UpdateUserPut;
-use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -24,8 +26,10 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::orderBy('created_at','desc')->paginate(10);
-        
+        //dd(Tag::find(1)->users());
+        User::find(2)->tags()->sync([1,2,3,4]);
+
+        $users = User::with('rol')->orderBy('created_at','desc')->paginate(10);
         return view('dashboard.user.index',['users' => $users]);
     }
 
@@ -47,13 +51,15 @@ class UserController extends Controller
      */
     public function store(StoreUserPost $request)
     {
-        User::create([
+        $user = User::create([
             'name' => $request['name'],
             'rol_id' => 1, //rol de admin
             'surname' => $request['surname'],
             'email' => $request['email'],
-            'password' => Hash::make($request['password']),
+            'password' => $request['password'],
         ]);
+
+        event(new UserCreated($user));
 
         return back()->with('status','Usuario creado con éxito');
     }
@@ -77,6 +83,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('edit', $user);
         return view('dashboard.user.edit',["user" => $user]);
     }
 
@@ -89,6 +96,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserPut $request, User $user)
     {
+        $this->authorize('edit', $user);
         $user->update([
             'name' => $request['name'],
             'surname' => $request['surname'],

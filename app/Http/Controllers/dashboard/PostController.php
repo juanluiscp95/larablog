@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers\dashboard;
 
+use App\Tag;
 use App\Post;
 use App\Category;
 use App\PostImage;
+use App\Helpers\CustomUrl;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostPost;
+use App\Http\Requests\UpdatePostPut;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -22,11 +31,98 @@ class PostController extends Controller
         $this->middleware(['auth','rol.admin']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::orderBy('created_at','desc')->paginate(10);
+
+        //$this->sendMail();
+
+        //dd(Storage::url('public/XOeeYwSWfo63Wm6yHQVZO84Q7f1HxnKullNYzlW7.jpeg'));
+
+        //return Storage::disk('local')->download("3jWmQS74GqgHjjOIz3rzMQzeDw4qh1SLOnqMhwmi.jpeg","spider_man.jpeg");
         
+        /*DB::transaction(function () {
+            DB::table('contacts')
+            ->where(["id" => 1])
+            ->delete();
+
+            $contact = DB::select('select * from contacts where id = ?', [5]);
+            dd($contact);
+
+            DB::table('contacts')
+            ->where(["id" => 10])
+            ->update(['name' => "Calderon"]);
+        });*/
+
+        
+        /*DB::beginTransaction();
+        DB::table('contacts')
+            ->where(["id" => 1])
+            ->delete();
+
+        DB::table('contacts')
+        ->where(["id" => 10])
+        ->update(['name' => "Calderon"]);
+        
+        //$contact = DB::select('select * from contacts where id = ?', [5]);
+        //dd($contact[0]);
+        DB::commit();*/
+        
+        
+
+        /*$personas = [
+            ["nombre" => "usuario 1", "edad" => 50],
+            ["nombre" => "usuario 2", "edad" => 10],
+            ["nombre" => "usuario 3", "edad" => 20],
+        ];*/
+
+        //dd($personas);
+
+        //dd(Category::all());
+
+        /*$collection1 = collect($personas);
+        //dd($collection1);
+        $collection2 = new Collection($personas);
+        //dd($collection2);
+        $collection3 = Collection::make($personas);*/
+        //dd($collection3);
+
+        /*dd($collection2->filter(function($value,$key){
+            return $value['edad'] > 17;
+        })
+        ->sum('edad'));*/
+
+        //$personas = ["usuario 1", "usuario 2", "usuario 3", "usuario 4"];
+        //$collection = collect($personas);
+        //dd((bool) $collection->intersect(['usuario 8'])->count());
+
+        $posts = Post::with('category')
+        ->orderBy('created_at', request('created_at', 'DESC'));
+
+        if($request->has('search')){
+            $posts = $posts->where('title', 'like', '%' . request('search') . '%');
+        }
+        
+        $posts = $posts->paginate(10);
+
+
         return view('dashboard.post.index',['posts' => $posts]);
+    }
+
+    private function sendMail(){
+        $data['title'] = "Datos de prueba";
+
+        Mail::send('emails.email',$data,function($message){
+            $message->to('juanluis@gmail.com','Juan')
+            ->subject("Gracias por escribirnos");
+        });
+
+        //dd(Mail::failures());
+
+        if(Mail::failures()){
+            return "Mensaje no enviado";
+        }else{
+            return "Mensaje enviado";
+        }
     }
 
     /**
@@ -36,8 +132,10 @@ class PostController extends Controller
      */
     public function create()
     {
+        $tags = Tag::pluck('id','title');
         $categories = Category::pluck('id','title');
-        return view('dashboard.post.create',['post' => new Post(),'categories' => $categories]);
+        $post = new Post();
+        return view('dashboard.post.create',compact('post','categories','tags'));
     }
 
     /**
@@ -56,11 +154,28 @@ class PostController extends Controller
             'content' => 'required|min:5'
         ]);*/
 
-        echo "hola mundo: ".$request->content;
-            
-        Post::create($request->validated());
+        if($request->url_clean == ""){
+            $urlClean = CustomUrl::urlTitle(CustomUrl::convertAccentedCharacters($request->title),'-',true);
+        } else {
+            $urlClean = CustomUrl::urlTitle(CustomUrl::convertAccentedCharacters($request->url_clean),'-',true);
+        }
 
-        //echo "hola mundo: ".$request("title");
+        $requestData = $request->validated();
+
+        $requestData['url_clean'] = $urlClean;
+
+        $validator = Validator::make($requestData, StorePostPost::myRules());
+
+        if ($validator->fails()) {
+            
+            return redirect('dashboard/post/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+            
+        $post = Post::create($requestData);
+
+        $post->tags()->sync($request->tags_id);
 
         return back()->with('status','Post creado con éxito');
 
@@ -79,6 +194,8 @@ class PostController extends Controller
         return view('dashboard.post.show',["post" => $post]);
     }
 
+    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -87,10 +204,18 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
+
+        //dd($post->tags->pluck("id"));
+        $tag = Tag::find(1);
+        $tags = Tag::pluck('id','title');
+        //dd($tag->posts);
+
+        //dd(old('tags_id'));
+
         //dd(PostImage::create(['image' => aaaa,'post_id' => 9]));
         //dd($post->image->image);
         $categories = Category::pluck('id','title');
-        return view('dashboard.post.edit',['post' => $post,'categories' => $categories]);
+        return view('dashboard.post.edit', compact('post','categories','tags'));
     }
 
     /**
@@ -100,10 +225,14 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StorePostPost $request, Post $post)
+    public function update(UpdatePostPut $request, Post $post)
     {
-        $post->update($request->validated());
+        //dd($request->tags_id);
 
+        //$post->tags()->attach(1);
+        $post->tags()->sync($request->tags_id);
+
+        $post->update($request->validated());
         return back()->with('status','Post actualizado con éxito');
     }
 
@@ -115,10 +244,37 @@ class PostController extends Controller
 
         $filename = time() . "." . $request->image->extension();
 
-        $request->image->move(public_path('images'),$filename);
+        //$request->image->move(public_path('images'),$filename);
 
-        PostImage::create(['image' => $filename,'post_id' => $post->id]);
+        $path = $request->image->store('public/images');
+       
+
+        PostImage::create(['image' => $path,'post_id' => $post->id]);
         return back()->with('status','Imagen subida con éxito');
+    }
+
+    public function contentImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|mimes:jpeg,bmp,png,jpg|max:10240' //10Mb
+        ]);
+
+        $filename = time() . "." . $request->image->extension();
+
+        $request->image->move(public_path('images_post'),$filename);
+
+        return response()->json(["default" => URL::to('/') . '/images_post/' . $filename]);
+        
+    }
+
+    public function imageDownload(PostImage $image){
+        return Storage::disk('local')->download($image->image);
+    }
+
+    public function imageDelete(PostImage $image){
+        $image->delete();
+        Storage::disk('local')->delete($image->image);
+        return back()->with('status','Imagen eliminada con éxito');
     }
 
     /**

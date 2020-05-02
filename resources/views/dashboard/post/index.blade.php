@@ -3,8 +3,19 @@
 @section('content')
 
 <a class="btn btn-success mt-3 mb-3" href="{{ route('post.create') }}">
-    Crear
+    <i class="fa fa-plus"></i>Crear
 </a>
+
+
+
+<form action="{{ route('post.index') }}" class="form-inline mb-3">
+    <select name="created_at" class="form-control">
+        <option value="DESC">Descendente</option>
+        <option {{ request('created_at') == "ASC" ? "selected" : '' }} value="ASC">Ascendente</option>
+    </select>
+    <input type="text" name="search" placeholder="Buscar..." class="ml-1 form-control" value="{{ request('search') }}">
+    <button type="submit" class="ml-2 btn btn-success"><i class="fa fa-search"></i></button>
+</form>
 
     <table class="table">
         <thead>
@@ -54,10 +65,11 @@
                         {{ $post->updated_at->format('d-m-Y') }}
                     </td>
                     <td>
-                        <a href="{{ route('post.show',$post->id) }}" class="btn btn-primary">Ver</a>
-                        <a href="{{ route('post.edit',$post->id) }}" class="btn btn-warning">Actualizar</a>
+                        <a href="{{ route('post.show',$post->id) }}" class="btn btn-primary"><i class="fa fa-2x fa-eye"></i></a>
+                        <a href="{{ route('post.edit',$post->id) }}" class="btn btn-warning"><i class="fa fa-2x fa-edit"></i></a>
+                        <a href="{{ route('post-comment.post',$post->id) }}" class="btn btn-dark"><i class="fa fa-2x fa-comments"></i></a>
                         
-                        <button data-toggle="modal" data-target="#deleteModal" data-id="{{ $post->id }}" class="btn btn-danger">Eliminar</button>
+                        <button data-toggle="modal" data-target="#deleteModal" data-id="{{ $post->id }}" class="btn btn-danger"><i class="fa fa-2x fa-trash"></i></button>
                         
                     </td>
                 </tr>
@@ -67,7 +79,12 @@
 
     
 
-    {{ $posts->links() }}
+    {{ $posts->appends(
+        [
+            'created_at' => request('created_at'),
+            'search' => request('search'),
+        ]
+        )->links() }}
 
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

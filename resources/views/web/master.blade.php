@@ -10,9 +10,15 @@
 </head>
 <body>
 
-    <div class="container" id="app">
+    <div id="app">
+        @include('web.partials.nav-header-main')
+        <div class="container mb-3 mt-3" >
 
-        @yield('content')
+            @yield('content')
+        </div>
+        
+
+        @include('web.partials.footer-main')
     </div>
     <script src="{{ asset("js/app.js") }}"></script>
 </body>

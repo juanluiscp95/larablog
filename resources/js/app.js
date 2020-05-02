@@ -6,7 +6,39 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+import router from './assets/router.js';
+
+
+//import MyUploadAdapter from './assets/ckeditor/MyUploadAdapter.js';
+
+var MyUploadAdapter = require('./assets/ckeditor/MyUploadAdapter.js');
+
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+
+
+
+
+
+
+function MyCustomUploadAdapterPlugin( editor ) {
+    editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
+        // Configure the URL to the upload script in your back-end here!
+        return new MyUploadAdapter( loader );
+    };
+}
+
+
+
+
+
+
+
+ClassicEditor.create(document.querySelector("#content"),{ extraPlugins: [ MyCustomUploadAdapterPlugin ]})
+    .then(editor => {})
+    .catch(error => {
+        console.error(error.stack);
+    });
 
 /**
  * The following block of code may be used to automatically register your
@@ -27,10 +59,16 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+//Vue.component("list-posts", require('./components/PostListComponent.vue').default);
+
+Vue.component("modal-post", require('./components/PostModalComponent.vue').default);
+
+Vue.component("post-list-default", require('./components/PostListDefaultComponent.vue').default);
+
+//import App from './components/App.vue';
+
 const app = new Vue({
     el: '#app',
-    data: {
-        message: "Hello Vue!",
-        posts: ['Título 1','Título 2','Título 3','Título 4','Título 5'],
-    }
+    //render: h => h(App),
+    router
 });

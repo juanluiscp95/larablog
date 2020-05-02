@@ -21,9 +21,21 @@
                 <input type="submit" class="btn btn-primary" value="Subir">
             </div>
         </div>
-
-        
-        
     </form>
+
+    <div class="row mt-3">
+    @foreach ($post->images as $image)
+        <div class="col-3">
+            <img class="w-100" src="{{ $image->getImageUrl() }}">
+            <a class="float-left btn btn-success btn-sm mt-2" href="{{ route("post.image-download",$image->id) }}">Descargar</a>
+
+            <form action="{{ route("post.image-delete",$image->id) }}" method="POST">
+                @method("DELETE")
+                @csrf
+                <button class="float-right btn btn-danger btn-sm mt-2" type="submit">Eliminar</button>
+            </form>
+        </div>
+    @endforeach
+    </div>
 
 @endsection
