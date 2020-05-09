@@ -7,6 +7,8 @@ use App\Post;
 use App\Category;
 use App\PostImage;
 use App\Helpers\CustomUrl;
+use App\Exports\PostsExport;
+use App\Imports\PostsImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostPost;
 use App\Http\Requests\UpdatePostPut;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,6 +32,17 @@ class PostController extends Controller
     public function __construct()
     {
         $this->middleware(['auth','rol.admin']);
+    }
+
+    public function export(){
+        return Excel::download(new PostsExport, 'posts.xlsx');
+    }
+
+    public function import() 
+    {
+        Excel::import(new PostsImport, 'posts.xlsx');
+        
+        return "Importado";
     }
 
     public function index(Request $request)

@@ -3,7 +3,7 @@
 @section('content')
 
 <a class="btn btn-success mt-3 mb-3" href="{{ route('user.create') }}">
-    <i class="fa fa-plus"></i>Crear
+    <i class="fa fa-plus"></i> Crear
 </a>
 
     <table class="table">

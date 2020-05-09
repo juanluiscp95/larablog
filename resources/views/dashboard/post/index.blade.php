@@ -2,8 +2,31 @@
 
 @section('content')
 
+<x-fragment.subview/>
+
+<x-ejemploinline></x-ejemploinline>
+
+<x-ejemplo message="Hola POST" :posts="$posts" class="container"/>
+
+<x-ejemplo message="Hola POST" :posts="$posts" class="container">
+    <p>Contenido adicional</p>
+
+    <x-slot name="title">
+        <h1>Titulo de nuestro listado</h1>
+    </x-slot>
+
+    <x-slot name="title3">
+        Subtítulo
+    </x-slot>
+
+</x-ejemplo>
+
 <a class="btn btn-success mt-3 mb-3" href="{{ route('post.create') }}">
-    <i class="fa fa-plus"></i>Crear
+    <i class="fa fa-plus"></i> Crear
+</a>
+
+<a class="btn btn-warning mt-3 mb-3" href="{{ route('post.export') }}">
+    <i class="fa fa-plus"></i> Exportar
 </a>
 
 

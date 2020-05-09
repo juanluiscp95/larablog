@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,12 +15,50 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+Route::get('request', function() {
+    //$response = Http::get('https://andromedabooks.es/');
 
-/*Route::get('/test', function () {
-    return "hola mundo";
+    /*Http::fake([
+        'andromedabooks.*' => Http::response("hola mundo",200)
+    ]);*/
+
+    //Http::fake();
+
+    $response = Http::delete('https://jsonplaceholder.typicode.com/posts/1',[
+        'user_id' => 101,
+        'name' => 'juan luis'
+    ]);
+
+    /*Http::assertSent(function ($request) {
+        dd($request);
+        return $request['name'] !== 'juan luis';
+    });*/
+
+    //$response->throw();
+    dd($response->body());
+    return "request";
 });
 
-Route::get('/hola/{nombre?}', function ($nombre = "Calderon") {
+
+Route::get('/test', function () {
+    $string = "       HOLA mundo calderón   ";
+    //$string = str_replace(" ","-",strtolower(trim($string))); 
+
+    /*$string = Str::of($string)
+        ->afterLast('o')
+        ->ascii();*/
+
+    $string = Str::of($string)
+        ->trim()
+        ->lower()
+        ->replace(" ","-")
+        ->ascii();
+
+    //dd($string);
+    return $string;
+});
+
+/*Route::get('/hola/{nombre?}', function ($nombre = "Calderon") {
     return "hola $nombre conocenos: <a href='".route("nosotros")."'>nosotros</a>";
 });
 
@@ -76,9 +115,28 @@ Route::get('/detail/{id}', 'web\WebController@detail');
 
 Route::get('/post-category/{id}', 'web\WebController@post_category');
 
+Route::get('/dashboard/excel/post-export', 'dashboard\PostController@export')->name('post.export');
+Route::get('/dashboard/excel/post-import', 'dashboard\PostController@import');
+
 Route::get('/contact', 'web\WebController@contact');
 
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//paquetes
+
+
+Route::get('/chart', 'PaquetesController@charts')->name('chart');
+Route::get('/image', 'PaquetesController@image')->name('image');
+Route::get('/qr_generate', 'PaquetesController@qr_generate')->name('qr_generate');
+Route::get('/translate', 'PaquetesController@translate')->name('translate');
+Route::get('/stripe_create_customer', 'PaquetesController@stripe_create_customer')->name('stripe_create_customer');
+Route::get('/stripe_payment_method_register', 'PaquetesController@stripe_payment_method_register')->name('stripe_payment_method_register');
+Route::get('/stripe_payment_method_create', 'PaquetesController@stripe_payment_method_create')->name('stripe_payment_method_create');
+Route::get('/stripe_payment_method', 'PaquetesController@stripe_payment_method')->name('stripe_payment_method');
+Route::get('/stripe_create_only_pay_form', 'PaquetesController@stripe_create_only_pay_form')->name('stripe_create_only_pay_form');
+Route::get('/stripe_create_only_pay', 'PaquetesController@stripe_create_only_pay')->name('stripe_create_only_pay');
+Route::get('/stripe_create_suscription', 'PaquetesController@stripe_create_suscription')->name('stripe_create_suscription');
+

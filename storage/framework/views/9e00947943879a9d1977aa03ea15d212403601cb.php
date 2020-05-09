@@ -3,7 +3,7 @@
 <?php $__env->startSection('content'); ?>
 
 <a class="btn btn-success mt-3 mb-3" href="<?php echo e(route('category.create')); ?>">
-    <i class="fa fa-plus"></i>Crear
+    <i class="fa fa-plus"></i> Crear
 </a>
 
     <table class="table">

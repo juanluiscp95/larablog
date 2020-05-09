@@ -2,66 +2,129 @@
     <div class="col-8 offset-2">
         <div class="card">
             <div class="card-header">
-
-                <img src="/images/ferrari_logo.png" class="logo_150 mx-auto d-block" alt="">
-                
-                
+                <h2 class="text-center"><i class="fa fa-smile-wink text-success"></i> Contáctame <i class="fa fa-smile-wink text-success"></i></h2>
             </div>
             <div class="card-body">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Nombre</span>
-                    </div>
-                    <input type="text" class="form-control" v-model="name">      
-                </div>
+                
+        <form @submit.prevent="onSubmit" class="contact">
 
-                <div class="input-group mt-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Apellido</span>
-                    </div>
-                    <input type="text" class="form-control" v-model="surname">      
-                </div>
+            <BaseInput label="Nombre" 
+            v-model="$v.form.name.$model"
+            :validator="$v.form.name"
+            ></BaseInput>
+   
 
-                <div class="input-group mt-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Email</span>
-                    </div>
-                    <input type="email" class="form-control" v-model="email">      
-                </div>
+            <BaseInput label="Apellido" v-model="$v.form.surname.$model" :validator="$v.form.surname"></BaseInput>
+            <BaseInput label="Email" type="email" v-model="$v.form.email.$model" :validator="$v.form.email"></BaseInput>
+            <BaseInput label="Teléfono" :mask="'(###) ###-####'" v-model="$v.form.phone.$model" :validator="$v.form.phone"></BaseInput>
 
-                <div class="input-group mt-3">
-                    <textarea class="form-control" placeholder="Comentarios" v-model="content"></textarea>     
-                </div>
-
-                <button @click="saveContact" class="btn btn-danger float-right mt-3 btn-lg">Enviar</button>
-
+            <div class="form-group">
+            <label>Contenido</label>
+            <textarea 
+            v-model="$v.form.content.$model" 
+            class="form-control" 
+            :class="{
+                'is-valid':!$v.form.content.$error && $v.form.content.$dirty,
+                'is-invalid':$v.form.content.$error,
+            }" 
+            rows="3"></textarea>
             </div>
+
+            <button :disabled="!formValid" type="submit" class="btn btn-primary"> <i class="fa fa-envelope"></i> Enviar</button>
+            <button class="btn btn-danger float-right" @click="resetForm"> <i class="fa fa-redo"></i> Limpiar</button>
+        </form>
+        </div>
         </div>
     </div>
-    
 </template>
 
 <script>
+
+import BaseInput from "../components/BaseInput.vue";
+import { required, minLength, email } from 'vuelidate/lib/validators'
+
 export default {
-    created(){
-        
+    components:{BaseInput},
+
+    data(){
+        return {
+            form:{
+                name:"",
+                surname:"",
+                email:"",
+                phone:"",
+                content:""
+            }
+        };
     },
-    methods: {
-        saveContact: function(){
-            console.log(this.name+""+this.surname+""+this.email+""+this.content);
-            return;
-            /*fetch('/api/post/' + this.$route.params.id)
-                .then(response => response.json())
-                .then(json => (this.post = json.data));*/
+    validations:{
+        form:{
+            name:{
+                required,
+                minLength: minLength(2)
+            },
+            surname:{
+                required,
+                minLength: minLength(2)
+            },
+            email:{
+                required,
+                email
+            },
+            phone:{
+                required,
+                minLength: minLength(14)
+            },
+            content:{
+                required,
+            }
         }
     },
-    data: function () {
-        return {
-            name:"",
-            surname:"",
-            email:"",
-            content:"contenido",
-        };
+    methods:{
+
+        resetForm(){
+            this.$v.form.name.$model = ""
+            this.$v.form.surname.$model = ""
+            this.$v.form.email.$model = ""
+            this.$v.form.phone.$model = ""
+            this.$v.form.content.$model = ""
+            
+
+            this.$v.$reset()
+
+            document.querySelectorAll("form.contact input, form.contact textarea").forEach(e => e.value="")
+            this.$awn.info("Formulario reiniciado")
+        },
+        onSubmit(){
+            if(!this.formValid)
+                return
+
+            axios.post('api/contact',{
+                name: this.$v.form.name.$model,
+                surname: this.$v.form.surname.$model,
+                email: this.$v.form.email.$model,
+                message: this.$v.form.content.$model,
+                phone: this.$v.form.phone.$model,
+            }).then(function(response){
+                console.log(response.data)
+                this.$awn.success("Contacto realizado con exito")
+            })
+            
+        }
+    },
+    computed:{
+        formValid(){
+            return !this.$v.$invalid;
+
+            /*return this.form.name.length > 0 &&
+                this.form.surname.length > 0 &&
+                this.form.email.length > 0 &&
+                this.form.phone.length > 0 &&
+                this.form.content.length > 0 */
+        }
     }
 };
 </script>
+<style lang="scss">
+@import '~vue-awesome-notifications/dist/styles/style.scss';
+</style>

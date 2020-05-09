@@ -2,8 +2,73 @@
 
 <?php $__env->startSection('content'); ?>
 
+ <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.fragment.subview','data' => []]); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withName('fragment.subview'); ?>
+<?php $component->withAttributes([]); ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?> 
+
+ <?php if (isset($component)) { $__componentOriginalc77a97b910be30a6904238a52865070a3b869ac6 = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\Ejemploinline::class, []); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withName('ejemploinline'); ?>
+<?php $component->withAttributes([]); ?> <?php if (isset($__componentOriginalc77a97b910be30a6904238a52865070a3b869ac6)): ?>
+<?php $component = $__componentOriginalc77a97b910be30a6904238a52865070a3b869ac6; ?>
+<?php unset($__componentOriginalc77a97b910be30a6904238a52865070a3b869ac6); ?>
+<?php endif; ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?> 
+
+ <?php if (isset($component)) { $__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\Ejemplo::class, ['message' => 'Hola POST','posts' => $posts]); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withName('ejemplo'); ?>
+<?php $component->withAttributes(['class' => 'container']); ?>
+<?php if (isset($__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c)): ?>
+<?php $component = $__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c; ?>
+<?php unset($__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c); ?>
+<?php endif; ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?> 
+
+ <?php if (isset($component)) { $__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c = $component; } ?>
+<?php $component = $__env->getContainer()->make(App\View\Components\Ejemplo::class, ['message' => 'Hola POST','posts' => $posts]); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withName('ejemplo'); ?>
+<?php $component->withAttributes(['class' => 'container']); ?>
+    <p>Contenido adicional</p>
+
+     <?php $__env->slot('title'); ?> 
+        <h1>Titulo de nuestro listado</h1>
+     <?php $__env->endSlot(); ?>
+
+     <?php $__env->slot('title3'); ?> 
+        Subtítulo
+     <?php $__env->endSlot(); ?>
+
+ <?php if (isset($__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c)): ?>
+<?php $component = $__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c; ?>
+<?php unset($__componentOriginalc6f8d4f9f961ddc01646cff5aa55c8471aec3a2c); ?>
+<?php endif; ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?> 
+
 <a class="btn btn-success mt-3 mb-3" href="<?php echo e(route('post.create')); ?>">
-    <i class="fa fa-plus"></i>Crear
+    <i class="fa fa-plus"></i> Crear
+</a>
+
+<a class="btn btn-warning mt-3 mb-3" href="<?php echo e(route('post.export')); ?>">
+    <i class="fa fa-plus"></i> Exportar
 </a>
 
 

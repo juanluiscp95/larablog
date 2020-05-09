@@ -7,6 +7,9 @@
 require('./bootstrap');
 
 import router from './assets/router.js';
+import VueMask from 'v-mask';
+import Vuelidate from 'vuelidate';
+import VueAWN from 'vue-awesome-notifications'
 
 
 //import MyUploadAdapter from './assets/ckeditor/MyUploadAdapter.js';
@@ -66,6 +69,10 @@ Vue.component("modal-post", require('./components/PostModalComponent.vue').defau
 Vue.component("post-list-default", require('./components/PostListDefaultComponent.vue').default);
 
 //import App from './components/App.vue';
+
+Vue.use(VueMask);
+Vue.use(Vuelidate);
+Vue.use(VueAWN);
 
 const app = new Vue({
     el: '#app',
